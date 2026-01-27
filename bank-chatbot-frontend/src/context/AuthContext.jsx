@@ -7,23 +7,22 @@ export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  const isAuthed = !!localStorage.getItem("accessToken");
+  const hasToken = !!localStorage.getItem("access"); // ✅
 
   async function refreshUser() {
     try {
       const me = await fetchMe();
       setUser(me);
     } catch (e) {
-      // token invalid / expired
       setUser(null);
-      logoutUser();
+      logoutUser(); // briše access/refresh
     } finally {
       setIsLoading(false);
     }
   }
 
   useEffect(() => {
-    if (isAuthed) refreshUser();
+    if (hasToken) refreshUser();
     else setIsLoading(false);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -34,8 +33,16 @@ export function AuthProvider({ children }) {
   }
 
   const value = useMemo(
-    () => ({ user, setUser, isLoading, isAuthed: !!user, refreshUser, logout }),
-    [user, isLoading]
+    () => ({
+      user,
+      setUser,
+      isLoading,
+      isAuthed: !!user,     // user učitan => authed
+      hasToken,             // ✅ korisno za guard
+      refreshUser,
+      logout,
+    }),
+    [user, isLoading, hasToken]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
@@ -46,4 +53,3 @@ export function useAuth() {
   if (!ctx) throw new Error("useAuth must be used inside AuthProvider");
   return ctx;
 }
-

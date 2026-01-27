@@ -178,83 +178,54 @@ class ChatView(APIView):
         msg = ser.validated_data["message"]
         session_id = ser.validated_data.get("session_id") or "default"
 
-        # 1️⃣ FAQ layer
+        user_obj = request.user if request.user.is_authenticated else None
+
+        # 1) Snimi user poruku
+        ChatMessage.objects.create(
+            user=user_obj,
+            session_id=session_id,
+            role="user",
+            content=msg,
+        )
+
+        # 2) FAQ layer (bez AI)
         faq = match_faq(msg)
         if faq:
             ChatMessage.objects.create(
-                user=request.user if request.user.is_authenticated else None,
-                session_id=session_id,
-                role="user",
-                content=msg,
-            )
-            ChatMessage.objects.create(
-                user=request.user if request.user.is_authenticated else None,
+                user=user_obj,
                 session_id=session_id,
                 role="assistant",
                 content=faq["reply"],
             )
+            return Response({"intent": faq.get("intent", "faq"), "reply": faq["reply"], "link": ""})
 
-            return Response({
-                "intent": "faq",
-                "reply": faq["reply"]
-            })
+        # 3) AI fallback (Groq)
+        try:
+            context = build_context()
+            ai = groq_chat_json(msg, context=context)
 
-        # 2️⃣ AI fallback (Groq)
-        context = build_context()
-        ai = groq_chat_json(msg, context=context)
+            reply = ai.get("reply", "Nemam odgovor trenutno.")
+            intent = ai.get("intent", "unknown")
+            link = ai.get("link", "")
 
-        reply = ai.get("reply", "Nemam odgovor trenutno.")
-        intent = ai.get("intent", "unknown")
-        link = ai.get("link", "")
+            ChatMessage.objects.create(
+                user=user_obj,
+                session_id=session_id,
+                role="assistant",
+                content=reply,
+            )
 
-        ChatMessage.objects.create(
-            user=request.user if request.user.is_authenticated else None,
-            session_id=session_id,
-            role="user",
-            content=msg,
-        )
-        ChatMessage.objects.create(
-            user=request.user if request.user.is_authenticated else None,
-            session_id=session_id,
-            role="assistant",
-            content=reply,
-        )
+            return Response({"intent": intent, "reply": reply, "link": link or ""})
 
-        return Response({
-            "intent": intent,
-            "reply": reply,
-            "link": link or ""
-        })
-
-
-
-
-        # 2️⃣ AI fallback
-        context = build_context()
-        ai = groq_chat_json(msg, context=context)
-
-        reply = ai.get("reply", "Nemam odgovor trenutno.")
-        intent = ai.get("intent", "unknown")
-        link = ai.get("link", "")
-
-        ChatMessage.objects.create(
-            user=request.user if request.user.is_authenticated else None,
-            session_id=session_id,
-            role="user",
-            content=msg,
-        )
-        ChatMessage.objects.create(
-            user=request.user if request.user.is_authenticated else None,
-            session_id=session_id,
-            role="assistant",
-            content=reply,
-        )
-
-        return Response({
-            "intent": intent,
-            "reply": reply,
-            "link": link or ""
-        })
+        except Exception:
+            fallback = "Mogu da pomognem sa informacijama o filijalama, terminima, dokumentima i uslugama banke."
+            ChatMessage.objects.create(
+                user=user_obj,
+                session_id=session_id,
+                role="assistant",
+                content=fallback,
+            )
+            return Response({"intent": "fallback", "reply": fallback, "link": ""})
 
 class ChatHistoryView(APIView):
     permission_classes = [permissions.IsAuthenticated]

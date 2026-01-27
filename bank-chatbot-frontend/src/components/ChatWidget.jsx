@@ -1,33 +1,91 @@
-import { useState } from "react";
-import { sendChat } from "../api/chat"; // vidi dole chat.js
+import { useEffect, useMemo, useRef, useState } from "react";
+import { sendChat, fetchChatHistory } from "../api/chat";
+import { useAuth } from "../context/AuthContext";
 
 export default function ChatWidget() {
-  const [messages, setMessages] = useState([
-    { role: "assistant", content: "Zdravo! Kako mogu da pomognem?" },
-  ]);
+  useAuth(); // dovoljno da se context “aktivira” ako ti u njemu radi fetchMe/guard; ne moraš ništa da koristiš
+
+  const [messages, setMessages] = useState([]);
   const [text, setText] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [sending, setSending] = useState(false);
+  const [loadingHistory, setLoadingHistory] = useState(true);
+  const [error, setError] = useState("");
+
+  const endRef = useRef(null);
+
+  const canSend = useMemo(() => text.trim().length > 0 && !sending, [text, sending]);
+
+  // autoscroll
+  useEffect(() => {
+    endRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages.length]);
+
+  // load history on mount
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadHistory() {
+      setLoadingHistory(true);
+      setError("");
+
+      try {
+        const history = await fetchChatHistory(); // očekujem: [{role, content, created_at}]
+        if (cancelled) return;
+
+        if (Array.isArray(history) && history.length > 0) {
+          setMessages(
+            history.map((m) => ({
+              role: m.role,
+              content: m.content,
+            }))
+          );
+        } else {
+          // ako nema istorije, ubaci greeting
+          setMessages([{ role: "assistant", content: "Zdravo! Kako mogu da pomognem?" }]);
+        }
+      } catch (e) {
+        if (!cancelled) {
+          setMessages([{ role: "assistant", content: "Zdravo! Kako mogu da pomognem?" }]);
+          setError("Ne mogu da učitam istoriju chata.");
+        }
+      } finally {
+        if (!cancelled) setLoadingHistory(false);
+      }
+    }
+
+    loadHistory();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   async function onSend(e) {
     e.preventDefault();
-    const trimmed = text.trim();
-    if (!trimmed || loading) return;
+    setError("");
 
-    setMessages((m) => [...m, { role: "user", content: trimmed }]);
+    const trimmed = text.trim();
+    if (!trimmed || sending) return;
+
+    const userMsg = { role: "user", content: trimmed };
+
+    // optimistic UI
+    setMessages((m) => [...m, userMsg]);
     setText("");
-    setLoading(true);
+    setSending(true);
 
     try {
       const res = await sendChat(trimmed); // { intent, reply, link? }
-      const reply = res?.reply || "Nemam odgovor trenutno.";
+      const reply = res?.reply?.trim() || "Nemam odgovor trenutno.";
+
       setMessages((m) => [...m, { role: "assistant", content: reply }]);
     } catch (err) {
       setMessages((m) => [
         ...m,
-        { role: "assistant", content: "Greška pri slanju poruke." },
+        { role: "assistant", content: "Greška pri slanju poruke. Pokušaj ponovo." },
       ]);
+      setError("Slanje nije uspelo.");
     } finally {
-      setLoading(false);
+      setSending(false);
     }
   }
 
@@ -43,6 +101,29 @@ export default function ChatWidget() {
           gap: 10,
         }}
       >
+        {loadingHistory && (
+          <div style={{ alignSelf: "center", opacity: 0.8, fontSize: 13, color: "white" }}>
+            Učitavam istoriju...
+          </div>
+        )}
+
+        {error && (
+          <div
+            style={{
+              alignSelf: "center",
+              opacity: 0.95,
+              fontSize: 13,
+              color: "white",
+              border: "1px solid rgba(255,255,255,0.18)",
+              padding: "6px 10px",
+              borderRadius: 10,
+              background: "rgba(255, 0, 0, 0.10)",
+            }}
+          >
+            {error}
+          </div>
+        )}
+
         {messages.map((msg, i) => (
           <div
             key={i}
@@ -52,15 +133,20 @@ export default function ChatWidget() {
               padding: "10px 12px",
               borderRadius: 14,
               background:
-                msg.role === "user" ? "rgba(255,255,255,0.12)" : "rgba(255,255,255,0.06)",
+                msg.role === "user"
+                  ? "rgba(255,255,255,0.12)"
+                  : "rgba(255,255,255,0.06)",
               border: "1px solid rgba(255,255,255,0.10)",
               color: "white",
               whiteSpace: "pre-wrap",
+              lineHeight: 1.35,
             }}
           >
             {msg.content}
           </div>
         ))}
+
+        <div ref={endRef} />
       </div>
 
       <form
@@ -77,6 +163,7 @@ export default function ChatWidget() {
           value={text}
           onChange={(e) => setText(e.target.value)}
           placeholder="Napiši poruku..."
+          disabled={loadingHistory}
           style={{
             flex: 1,
             padding: "10px 12px",
@@ -89,16 +176,16 @@ export default function ChatWidget() {
         />
         <button
           type="submit"
-          disabled={loading}
+          disabled={!canSend || loadingHistory}
           style={{
             padding: "10px 14px",
             borderRadius: 12,
             border: "none",
-            cursor: "pointer",
-            opacity: loading ? 0.6 : 1,
+            cursor: canSend ? "pointer" : "not-allowed",
+            opacity: !canSend || loadingHistory ? 0.6 : 1,
           }}
         >
-          {loading ? "..." : "Pošalji"}
+          {sending ? "..." : "Pošalji"}
         </button>
       </form>
     </div>

@@ -17,7 +17,11 @@ export async function fetchMe() {
 
 export async function loginUser({ username, password }) {
   const res = await api.post("/auth/login/", { username, password });
-  return res.data; // { access, refresh }
+
+  localStorage.setItem("access", res.data.access);
+  localStorage.setItem("refresh", res.data.refresh);
+
+  return res.data;
 }
 export function logoutUser() {
   // JWT logout = obriši tokene lokalno
