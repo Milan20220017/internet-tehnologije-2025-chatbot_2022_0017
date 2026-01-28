@@ -64,23 +64,42 @@ return (
             )}
 
             <div className="mb-3">
-              <label className="form-label">Filijala</label>
-              <select
-                className="form-select"
-                value={branchId}
-                onChange={(e) => {
-                  setMsg("");
-                  setBranchId(e.target.value);
-                }}
-              >
-                <option value="">Izaberi filijalu</option>
-                {branches.map((b) => (
-                  <option key={b.id} value={b.id}>
-                    {b.name}
-                  </option>
-                ))}
-              </select>
-            </div>
+  <label className="form-label">Filijala</label>
+
+  <div className="dropdown">
+    <button
+      className="form-control d-flex justify-content-between align-items-center"
+      type="button"
+      data-bs-toggle="dropdown"
+      aria-expanded="false"
+    >
+      <span>
+        {branchId
+          ? branches.find(b => String(b.id) === String(branchId))?.name
+          : "Izaberi filijalu"}
+      </span>
+      <span className="ms-2 opacity-75">▾</span>
+    </button>
+
+    <ul className="dropdown-menu w-100">
+      {branches.map((b) => (
+        <li key={b.id}>
+          <button
+            type="button"
+            className={"dropdown-item " + (String(branchId) === String(b.id) ? "active" : "")}
+            onClick={() => {
+              setMsg("");
+              setBranchId(String(b.id));
+            }}
+          >
+            {b.name}
+          </button>
+        </li>
+      ))}
+    </ul>
+  </div>
+</div>
+
 
             <div className="mb-3">
               <label className="form-label">Datum</label>

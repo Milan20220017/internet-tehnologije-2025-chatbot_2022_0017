@@ -1,87 +1,157 @@
-:root{
+:root {
   --bg0: #0b1020;
   --bg1: #0a0f1a;
-  --glass: rgba(255,255,255,0.06);
-  --border: rgba(255,255,255,0.12);
-  --text: rgba(255,255,255,0.92);
-  --muted: rgba(255,255,255,0.65);
+
+  --card-bg: rgba(20, 24, 35, 0.88);
+  --card-border: rgba(255,255,255,0.08);
+
+  --text: #f1f5f9;
+  --muted: #94a3b8;
+
+  --primary: #2563eb;
+  --primary-hover: #1d4ed8;
+
+  --radius: 16px;
 }
 
-html, body, #root { height: 100%; }
+html, body, #root {
+  height: 100%;
+}
 
-body{
+body {
   margin: 0;
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI;
   color: var(--text);
+
   background:
-    radial-gradient(1200px 600px at 10% 10%, rgba(124,58,237,0.22), transparent 60%),
-    radial-gradient(900px 500px at 90% 20%, rgba(59,130,246,0.18), transparent 55%),
-    radial-gradient(900px 500px at 50% 95%, rgba(16,185,129,0.12), transparent 60%),
+    radial-gradient(1200px 600px at 10% 10%, rgba(124,58,237,0.18), transparent 60%),
+    radial-gradient(900px 500px at 90% 20%, rgba(59,130,246,0.15), transparent 55%),
     linear-gradient(180deg, var(--bg0), var(--bg1));
-  font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
 }
 
-.page { min-height: 100%; }
-
-.app-container{
-  max-width: 980px;
-  margin: 0 auto;
-  padding: 22px 18px 60px;
+/* ===== PAGE WRAPPER ===== */
+.page {
+  min-height: 100%;
 }
 
-.app-card{
-  background: var(--glass);
-  border: 1px solid var(--border);
-  border-radius: 18px;
-  padding: 18px;
-  backdrop-filter: blur(10px);
-  box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+/* ===== PREMIUM CARD ===== */
+.app-card {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius);
+  padding: 28px;
+  box-shadow: 0 25px 50px rgba(0,0,0,.45);
 }
 
-.cardTitle{
-  font-size: 22px;
-  margin: 0 0 14px;
-  letter-spacing: 0.2px;
+/* ===== HEADINGS ===== */
+h1, h2, h3 {
+  font-weight: 600;
+  letter-spacing: .2px;
 }
 
-.muted{ color: var(--muted); }
-
-.app-row{
-  display: flex;
-  gap: 12px;
-  align-items: center;
-  justify-content: space-between;
+.card-title {
+  font-size: 1.5rem;
 }
 
-.app-btn{
-  background: rgba(255,255,255,0.08);
-  border: 1px solid rgba(255,255,255,0.14);
-  color: var(--text);
-  padding: 10px 12px;
-  border-radius: 12px;
-  cursor: pointer;
-  transition: transform .08s ease, background .15s ease;
-}
-.app-btn:hover{ background: rgba(255,255,255,0.12); }
-.app-btn:active{ transform: translateY(1px); }
-
-.pill{
-  display: inline-flex;
-  gap: 8px;
-  align-items: center;
-  padding: 6px 10px;
-  border-radius: 999px;
-  border: 1px solid rgba(255,255,255,0.12);
-  background: rgba(255,255,255,0.06);
+/* ===== FORM ELEMENTS ===== */
+.form-label {
+  font-size: 0.85rem;
   color: var(--muted);
-  font-size: 13px;
 }
 
-/* stari glass navbar ostavljen ako ti zatreba kasnije */
-.glassNav{
-  position: sticky;
-  top: 0;
-  z-index: 50;
-  backdrop-filter: blur(12px);
-  background: rgba(10,15,26,0.55);
-  border-bottom: 1px solid rgba(255,255,255,0.10);
+.form-control,
+.form-select {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid var(--card-border);
+  color: var(--text);
+  border-radius: 10px;
+}
+
+.form-control:focus,
+.form-select:focus {
+  background: rgba(255,255,255,0.07);
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px rgba(37,99,235,0.25);
+  color: var(--text);
+}
+
+/* ===== BUTTONS ===== */
+.btn-primary {
+  background: var(--primary);
+  border: none;
+  border-radius: 12px;
+  padding: 12px;
+  font-weight: 500;
+}
+
+.btn-primary:hover {
+  background: var(--primary-hover);
+}
+
+.btn-outline-light {
+  border-radius: 10px;
+}
+
+/* ===== LIST GROUP ===== */
+.list-group-item {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid var(--card-border);
+  color: var(--text);
+}
+
+.list-group-item:hover {
+  background: rgba(255,255,255,0.08);
+}
+
+.list-group-item.active {
+  background: var(--primary);
+  border-color: var(--primary);
+}
+
+/* ===== ALERTS ===== */
+.alert {
+  background: rgba(255,255,255,0.06);
+  border: 1px solid var(--card-border);
+  color: var(--text);
+}
+/* premium hover animacija */
+.app-card {
+  transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+  will-change: transform;
+}
+
+.app-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 35px 70px rgba(0,0,0,.55);
+  border-color: rgba(255,255,255,0.14);
+}
+/* tamni dropdown meni */
+.dropdown-menu {
+  background: rgba(15,18,30,0.98);
+  border: 1px solid rgba(255,255,255,0.10);
+  border-radius: 12px;
+  box-shadow: 0 20px 50px rgba(0,0,0,.55);
+  backdrop-filter: blur(10px);
+}
+
+.dropdown-item {
+  color: rgba(255,255,255,0.88);
+}
+
+.dropdown-item:hover,
+.dropdown-item:focus {
+  background: rgba(37,99,235,0.18);
+  color: #fff;
+}
+
+.dropdown-item.active {
+  background: rgba(37,99,235,0.35);
+  color: #fff;
+}
+.list-group-item {
+  transition: transform .12s ease, background .12s ease, border-color .12s ease;
+}
+
+.list-group-item:hover {
+  transform: translateY(-1px);
 }
