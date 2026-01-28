@@ -2,16 +2,12 @@
   --bg0: #0b1020;
   --bg1: #0a0f1a;
   --glass: rgba(255,255,255,0.06);
-  --glass2: rgba(255,255,255,0.10);
   --border: rgba(255,255,255,0.12);
   --text: rgba(255,255,255,0.92);
   --muted: rgba(255,255,255,0.65);
-  --accent: #7c3aed; /* ljubičasta */
 }
 
-html, body, #root {
-  height: 100%;
-}
+html, body, #root { height: 100%; }
 
 body{
   margin: 0;
@@ -23,13 +19,16 @@ body{
     linear-gradient(180deg, var(--bg0), var(--bg1));
   font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
 }
-.container{
+
+.page { min-height: 100%; }
+
+.app-container{
   max-width: 980px;
   margin: 0 auto;
-  padding: 28px 18px 60px;
+  padding: 22px 18px 60px;
 }
 
-.card{
+.app-card{
   background: var(--glass);
   border: 1px solid var(--border);
   border-radius: 18px;
@@ -44,18 +43,16 @@ body{
   letter-spacing: 0.2px;
 }
 
-.muted{
-  color: var(--muted);
-}
+.muted{ color: var(--muted); }
 
-.row{
+.app-row{
   display: flex;
   gap: 12px;
   align-items: center;
   justify-content: space-between;
 }
 
-.btn{
+.app-btn{
   background: rgba(255,255,255,0.08);
   border: 1px solid rgba(255,255,255,0.14);
   color: var(--text);
@@ -64,8 +61,8 @@ body{
   cursor: pointer;
   transition: transform .08s ease, background .15s ease;
 }
-.btn:hover{ background: rgba(255,255,255,0.12); }
-.btn:active{ transform: translateY(1px); }
+.app-btn:hover{ background: rgba(255,255,255,0.12); }
+.app-btn:active{ transform: translateY(1px); }
 
 .pill{
   display: inline-flex;
@@ -78,30 +75,9 @@ body{
   color: var(--muted);
   font-size: 13px;
 }
-/* ---- Layout ---- */
-.page {
-  min-height: 100%;
-}
 
-.container {
-  max-width: 980px;
-  margin: 0 auto;
-  padding: 22px 18px 60px;
-}
-
-.card {
-  background: rgba(255,255,255,0.06);
-  border: 1px solid rgba(255,255,255,0.12);
-  border-radius: 18px;
-  padding: 18px;
-  backdrop-filter: blur(10px);
-  box-shadow: 0 10px 30px rgba(0,0,0,0.25);
-}
-
-.muted { color: rgba(255,255,255,0.65); }
-
-/* ---- Navbar (glass + sticky) ---- */
-.navbar {
+/* stari glass navbar ostavljen ako ti zatreba kasnije */
+.glassNav{
   position: sticky;
   top: 0;
   z-index: 50;
@@ -109,69 +85,3 @@ body{
   background: rgba(10,15,26,0.55);
   border-bottom: 1px solid rgba(255,255,255,0.10);
 }
-
-.navInner {
-  max-width: 980px;
-  margin: 0 auto;
-  padding: 12px 18px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 14px;
-}
-
-.brand {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-weight: 800;
-  letter-spacing: 0.2px;
-}
-
-.brandDot {
-  width: 10px;
-  height: 10px;
-  border-radius: 999px;
-  background: rgba(124,58,237,0.9);
-  box-shadow: 0 0 0 6px rgba(124,58,237,0.15);
-}
-
-.navLinks {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  flex-wrap: wrap;
-}
-
-.navLink {
-  text-decoration: none;
-  color: rgba(255,255,255,0.75);
-  padding: 8px 10px;
-  border-radius: 12px;
-  border: 1px solid transparent;
-  transition: background .15s ease, border-color .15s ease;
-}
-
-.navLink:hover {
-  background: rgba(255,255,255,0.06);
-  border-color: rgba(255,255,255,0.10);
-}
-
-.navLinkActive {
-  color: rgba(255,255,255,0.95);
-  background: rgba(255,255,255,0.08);
-  border-color: rgba(255,255,255,0.14);
-}
-
-.btn {
-  background: rgba(255,255,255,0.08);
-  border: 1px solid rgba(255,255,255,0.14);
-  color: rgba(255,255,255,0.92);
-  padding: 9px 12px;
-  border-radius: 12px;
-  cursor: pointer;
-  transition: transform .08s ease, background .15s ease;
-}
-
-.btn:hover { background: rgba(255,255,255,0.12); }
-.btn:active { transform: translateY(1px); }

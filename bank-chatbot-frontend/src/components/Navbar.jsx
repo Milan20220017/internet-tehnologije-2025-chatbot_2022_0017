@@ -1,50 +1,64 @@
 import { NavLink, useNavigate } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../context/AuthContext.jsx"; // prilagodi putanju
 
 export default function Navbar() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
 
   const linkClass = ({ isActive }) =>
-    isActive ? "navLink navLinkActive" : "navLink";
+    "nav-link" + (isActive ? " active fw-semibold" : "");
 
   return (
-    <div className="navbar">
-      <div className="navInner">
-        <div className="brand">
-          <span className="brandDot" />
-          Čitaonica
-        </div>
+    <nav className="navbar navbar-expand-lg navbar-dark bg-dark sticky-top border-bottom border-secondary">
+      <div className="container">
+<span className="navbar-brand fw-bold">Banka</span>
 
-        <div className="navLinks">
-          <NavLink to="/" className={linkClass}>Početna</NavLink>
-          <NavLink to="/branches" className={linkClass}>Filijale</NavLink>
-          <NavLink to="/my-appointments" className={linkClass}>Moji termini</NavLink>
-          <NavLink to="/chat" className={linkClass}>Chat</NavLink>
+        <button
+          className="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#mainNav"
+        >
+          <span className="navbar-toggler-icon" />
+        </button>
 
-          {!user ? (
-            <>
-              <NavLink to="/login" className={linkClass}>Login</NavLink>
-              <NavLink to="/register" className={linkClass}>Register</NavLink>
-            </>
-          ) : (
-            <>
-              <span className="muted" style={{ padding: "0 6px", fontSize: 13 }}>
-                Ulogovan: <b style={{ color: "rgba(255,255,255,0.9)" }}>{user.username}</b>
-              </span>
-              <button
-                className="btn"
-                onClick={() => {
-                  logout();
-                  navigate("/login");
-                }}
-              >
-                Logout
-              </button>
-            </>
-          )}
+        <div className="collapse navbar-collapse" id="mainNav">
+          <ul className="navbar-nav me-auto mb-2 mb-lg-0">
+            <li className="nav-item">
+              <NavLink to="/" className={linkClass}>Početna</NavLink>
+            </li>
+            <li className="nav-item">
+              <NavLink to="/branches" className={linkClass}>Filijale</NavLink>
+            </li>
+            <li className="nav-item">
+              <NavLink to="/my-appointments" className={linkClass}>Moji termini</NavLink>
+            </li>
+          </ul>
+          <div className="d-flex align-items-center gap-2">
+            {!user ? (
+              <>
+                <NavLink to="/login" className="btn btn-outline-light btn-sm">Login</NavLink>
+                <NavLink to="/register" className="btn btn-primary btn-sm">Register</NavLink>
+              </>
+            ) : (
+              <>
+                <span className="text-white-50 small">
+                  Ulogovan: <span className="text-white fw-semibold">{user.username}</span>
+                </span>
+                <button
+                  className="btn btn-outline-light btn-sm"
+                  onClick={() => {
+                    logout();
+                    navigate("/login");
+                  }}
+                >
+                  Logout
+                </button>
+              </>
+            )}
+          </div>
         </div>
       </div>
-    </div>
+    </nav>
   );
 }

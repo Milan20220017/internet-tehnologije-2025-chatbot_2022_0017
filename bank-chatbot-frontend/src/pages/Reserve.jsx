@@ -49,31 +49,96 @@ export default function Reserve() {
     }
   };
 
-  return (
-    <div style={{ maxWidth: 520, padding: 16 }}>
-      <h1>Rezerviši termin</h1>
+return (
+  <div className="container py-5">
+    <div className="row justify-content-center">
+      <div className="col-12 col-md-7 col-lg-6">
+        <div className="card bg-dark text-light border-secondary shadow">
+          <div className="card-body">
+            <h3 className="card-title mb-4">Rezerviši termin</h3>
 
-      {msg && <p>{msg}</p>}
+            {msg && (
+              <div className="alert alert-info border-0" role="alert">
+                {msg}
+              </div>
+            )}
 
-      <div style={{ display: "grid", gap: 12 }}>
-        <BranchSelect branches={branches} value={branchId} onChange={setBranchId} />
+            <div className="mb-3">
+              <label className="form-label">Filijala</label>
+              <select
+                className="form-select"
+                value={branchId}
+                onChange={(e) => {
+                  setMsg("");
+                  setBranchId(e.target.value);
+                }}
+              >
+                <option value="">Izaberi filijalu</option>
+                {branches.map((b) => (
+                  <option key={b.id} value={b.id}>
+                    {b.name}
+                  </option>
+                ))}
+              </select>
+            </div>
 
-        <div>
-          <label>Datum</label>
-          <input
-            type="date"
-            value={date}
-            onChange={(e) => setDate(e.target.value)}
-            style={{ width: "100%", padding: 8 }}
-          />
+            <div className="mb-3">
+              <label className="form-label">Datum</label>
+              <input
+                type="date"
+                className="form-control"
+                value={date}
+                onChange={(e) => {
+                  setMsg("");
+                  setDate(e.target.value);
+                }}
+              />
+            </div>
+
+            <div className="mb-3">
+              <label className="form-label">Slobodni termini</label>
+
+              {!branchId || !date ? (
+                <div className="text-white-50 small">
+                  Izaberi filijalu i datum da vidiš slobodne slotove.
+                </div>
+              ) : slots.length === 0 ? (
+                <div className="alert alert-secondary mb-0">
+                  Nema slobodnih termina.
+                </div>
+              ) : (
+                <div className="list-group">
+                  {slots.map((s) => (
+                    <button
+                      key={s}
+                      type="button"
+                      className={
+                        "list-group-item list-group-item-action d-flex justify-content-between align-items-center " +
+                        (selectedSlot === s ? "active" : "")
+                      }
+                      onClick={() => setSelectedSlot(s)}
+                    >
+                      <span>{s}</span>
+                      {selectedSlot === s && (
+                        <span className="badge bg-light text-dark">Izabran</span>
+                      )}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            <button
+              className="btn btn-primary w-100"
+              disabled={!branchId || !selectedSlot}
+              onClick={handleReserve}
+            >
+              Zakaži
+            </button>
+          </div>
         </div>
-
-        <SlotPicker slots={slots} value={selectedSlot} onChange={setSelectedSlot} />
-
-        <button onClick={handleReserve} disabled={!selectedSlot}>
-          Zakaži
-        </button>
       </div>
     </div>
-  );
+  </div>
+);
 }

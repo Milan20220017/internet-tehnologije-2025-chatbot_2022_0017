@@ -23,7 +23,7 @@ export default function App() {
     <div className="page">
       <Navbar />
 
-      <div className="container">
+      <div className="container py-4">
         <Routes>
           <Route path="/" element={<Navigate to="/reserve" replace />} />
           <Route path="/login" element={<Login />} />
