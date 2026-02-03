@@ -9,6 +9,9 @@ venv/
 db.sqlite3
 media/
 staticfiles/
+node_modules/
+dist/
+.vite/
 
 # Env vars
 .env
