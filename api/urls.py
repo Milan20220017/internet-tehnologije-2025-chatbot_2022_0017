@@ -1,6 +1,7 @@
 from django.urls import path
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from .views import RegisterView, MeView, ChatHistoryView, EmployeeAppointmentsView, WeatherView
+from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 
 from .views import (
     BranchListView,
@@ -29,5 +30,7 @@ urlpatterns = [
     path("chat/history/", ChatHistoryView.as_view(), name="chat_history"),
     path("employee/appointments/", EmployeeAppointmentsView.as_view(), name="employee_appointments"),
     path("weather/", WeatherView.as_view(), name="weather"),
+    path("schema/", SpectacularAPIView.as_view(), name="schema"),
+    path("docs/", SpectacularSwaggerView.as_view(url_name="schema"), name="swagger-ui"),
 ]
 
