@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       DJANGO_SETTINGS_MODULE: backend.settings
-      SECRET_KEY = os.getenv("DJANGO_SECRET_KEY") or os.getenv("SECRET_KEY") or "dev-secret-key"
+      SECRET_KEY: dev-secret-key
       DEBUG: "0"
       OPENWEATHER_API_KEY: "dummy"
     steps:
