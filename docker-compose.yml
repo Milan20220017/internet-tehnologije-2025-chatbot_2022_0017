@@ -15,7 +15,7 @@ services:
   frontend:
     build: ./frontend
     ports:
-      - "5172:5172"
+      - "5173:5173"
     volumes:
       - ./frontend:/app
       - /app/node_modules
@@ -23,7 +23,7 @@ services:
       - CHOKIDAR_USEPOLLING=true
     depends_on:
       - backend
-    command: npm run dev -- --host 0.0.0.0 --port 5172
+    command: npm run dev -- --host 0.0.0.0 --port 5173
 
 volumes:
   sqlite_data:
