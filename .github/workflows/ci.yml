@@ -7,18 +7,16 @@ on:
     branches: [ develop, main ]
 
 jobs:
-  backend-tests:
+   backend-tests:
     runs-on: ubuntu-latest
     env:
       DJANGO_SETTINGS_MODULE: backend.settings
       SECRET_KEY: ci-secret-key
       DEBUG: "0"
-      OPENWEATHER_API_KEY: "dummy"
+      OPENWEATHER_API_KEY: dummy
     steps:
       - uses: actions/checkout@v4
-
-      - name: Set up Python
-        uses: actions/setup-python@v5
+      - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
 
@@ -27,13 +25,15 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r backend/requirements.txt
 
+      - name: Create SQLite data dir
+        run: mkdir -p data
+
       - name: Run Django migrations
-        run: |
-          python manage.py migrate --noinput
+        run: python manage.py migrate --noinput
 
       - name: Run backend tests
-        run: |
-          python manage.py test
+        run: python manage.py test
+
 
   frontend-build:
     runs-on: ubuntu-latest
