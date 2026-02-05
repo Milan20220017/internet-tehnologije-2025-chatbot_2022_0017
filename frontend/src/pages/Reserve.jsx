@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { getBranches, getBranchSlots, createAppointment } from "../api/appointments";
-import { me } from "../api/auth"; // <--- dodaj ovaj fajl/poziv (GET /api/auth/me/)
+import { me } from "../api/auth"; 
 
 export default function Reserve() {
   const [branches, setBranches] = useState([]);
@@ -26,21 +26,18 @@ function formatSlot(iso) {
   });
 }
 
-  // Učitavanje trenutnog korisnika (da znamo da li je zaposleni)
   useEffect(() => {
     (async () => {
       try {
         const u = await me();
         setUser(u);
       } catch (e) {
-        // Ako nema tokena ili endpointa, user ostaje null
       } finally {
         setUserLoaded(true);
       }
     })();
   }, []);
 
-  // Prepoznaj zaposlenog (podržava i role i is_staff)
   const isEmployee = useMemo(() => {
     if (!user) return false;
     if (user.role) return String(user.role).toLowerCase() === "employee";
@@ -92,7 +89,6 @@ const handleReserve = async () => {
 setToastOpen(true);
 setTimeout(() => setToastOpen(false), 2500);
 
-    // ✅ UX: skloni izabrani termin iz liste (da se vidi da je zauzet)
     setSlots((prev) => prev.filter((x) => x !== selectedSlot));
     setSelectedSlot("");
   } catch (e) {
@@ -126,7 +122,6 @@ setTimeout(() => setToastOpen(false), 2500);
                 </div>
               )}
 
-              {/* Ako je user učitan i zaposlen -> objasni i sakrij formu */}
               {userLoaded && isEmployee ? (
                 <div className="alert alert-warning border-0" role="alert">
                   Zaposleni ne mogu da rezervišu termine. Možete pregledati raspored u panelu za zaposlene.

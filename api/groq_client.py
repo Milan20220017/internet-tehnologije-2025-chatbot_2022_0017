@@ -10,15 +10,9 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-# ----------------------------
-# Logging
-# ----------------------------
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
-# ----------------------------
-# Types
-# ----------------------------
 Intent = Literal[
     "greeting",
     "branches_hours",
@@ -34,11 +28,9 @@ Intent = Literal[
     "unknown",
 ]
 
-
 class ChatTurn(TypedDict):
     role: Literal["user", "assistant"]
     content: str
-
 
 class BotResponse(TypedDict):
     intent: Intent
@@ -61,9 +53,6 @@ _ALLOWED_INTENTS = {
     "unknown",
 }
 
-# ----------------------------
-# Prompt (general assistant + bank focus)
-# ----------------------------
 SYSTEM_PROMPT = """
 Ti si koristan asistent koji prvenstveno pomaže kao bankarski chatbot za Srbiju (filijale, radno vreme, termini, dokumentacija, osnovni info).
 ALI: možeš odgovoriti i na opšta pitanja korisnika (datum, vreme, škola, tehnologije, itd).
@@ -103,9 +92,6 @@ Sadržaj za popravku:
 """.strip()
 
 
-# ----------------------------
-# Client
-# ----------------------------
 def groq_client() -> OpenAI:
     key = os.getenv("GROQ_API_KEY")
     if not key:
@@ -114,9 +100,6 @@ def groq_client() -> OpenAI:
     return OpenAI(api_key=key, base_url=base_url)
 
 
-# ----------------------------
-# Helpers
-# ----------------------------
 def _extract_first_json_object_balanced(text: str) -> str:
     s = (text or "").strip()
     if not s:
@@ -152,7 +135,7 @@ def _normalize_output(data: Dict[str, Any]) -> BotResponse:
         intent = "unknown"
         reply = "Nisam siguran kako da odgovorim na to. Možeš li precizirati pitanje?"
 
-    return {"intent": intent, "reply": reply, "link": link}  # type: ignore[return-value]
+    return {"intent": intent, "reply": reply, "link": link}  
 
 
 def _build_user_content(user_message: str, context: str = "", state: Optional[Dict[str, Any]] = None) -> str:
@@ -184,11 +167,9 @@ def _compact_history(history: List[ChatTurn], max_turns: int) -> List[ChatTurn]:
         if role not in ("user", "assistant") or not content:
             continue
 
-        # skrati mega-duge poruke da ne “preuzmu” ton razgovora
         if len(content) > 800:
             content = content[:800].rstrip() + "…"
 
-        # očisti višestruke razmake/novi red
         content = re.sub(r"\s+", " ", content).strip()
         out.append({"role": role, "content": content})
     return out
@@ -222,7 +203,6 @@ def _is_time_question(msg: str) -> bool:
 
 def _today_reply() -> str:
     today = datetime.date.today()
-    # Dan u sedmici na srpskom (ekavica)
     days = {
         0: "ponedeljak",
         1: "utorak",
@@ -240,15 +220,12 @@ def _time_reply() -> str:
     return f"Trenutno je {now.strftime('%H:%M')}."
 
 
-# ----------------------------
-# Main
-# ----------------------------
 def groq_chat_json(
     user_message: str,
     context: str = "",
     history: Optional[List[ChatTurn]] = None,
     state: Optional[Dict[str, Any]] = None,
-    max_history_turns: int = 6,  # DEFAULT MANJE: da ne “pamti sve”
+    max_history_turns: int = 6,  
 ) -> BotResponse:
     """
     user_message: trenutno pitanje korisnika
@@ -262,7 +239,6 @@ def groq_chat_json(
     if not msg:
         return {"intent": "unknown", "reply": "Napiši pitanje pa ću pomoći.", "link": ""}
 
-    # 0) Brzi odgovori bez modela (stabilno + bolje UX)
     if _is_date_question(msg):
         return {"intent": "today_date", "reply": _today_reply(), "link": ""}
 
@@ -271,14 +247,12 @@ def groq_chat_json(
 
     client = groq_client()
 
-    # Preporuka: na .env stavi GROQ_MODEL=openai/gpt-oss-120b
     model = os.getenv("GROQ_MODEL", "openai/gpt-oss-120b")
 
     user_content = _build_user_content(msg, context=context, state=state)
 
     messages: List[Dict[str, str]] = [{"role": "system", "content": SYSTEM_PROMPT}]
 
-    # 1) Ograničena istorija
     if history:
         compact = _compact_history(history, max_history_turns)
         for turn in compact:
@@ -286,7 +260,6 @@ def groq_chat_json(
 
     messages.append({"role": "user", "content": user_content})
 
-    # 2) Poziv
     temperature = float(os.getenv("GROQ_TEMPERATURE", "0.7"))
     max_tokens = int(os.getenv("GROQ_MAX_TOKENS", "500"))
 
@@ -323,7 +296,6 @@ def groq_chat_json(
         except Exception:
             pass
 
-    # 4) Repair pass (samo ako baš mora)
     try:
         repair_messages = [
             {"role": "system", "content": SYSTEM_PROMPT},
@@ -355,7 +327,6 @@ def groq_chat_json(
     except Exception as e:
         logger.info("Repair pass failed: %s", e)
 
-    # 5) Final fallback (vrati skraćeno, ali bez rušenja)
     return {
         "intent": "general",
         "reply": content[:600] if content else "Nisam uspeo da generišem validan odgovor.",

@@ -11,8 +11,7 @@ class UserAdminForm(forms.ModelForm):
     1) Validira pravila (role/branch/is_staff/is_superuser)
     2) Ako je password unesen kao "plain text" u adminu, pretvori ga u hash (set_password)
     """
-
-    class Meta:
+    class Meta:    
         model = User
         fields = "__all__"
 
@@ -23,24 +22,20 @@ class UserAdminForm(forms.ModelForm):
         is_staff = cleaned.get("is_staff")
         is_superuser = cleaned.get("is_superuser")
 
-        # SUPERUSER → admin
         if is_superuser:
             cleaned["role"] = "admin"
             cleaned["is_staff"] = True
             cleaned["branch"] = None
             return cleaned
 
-        # EMPLOYEE → mora imati branch
         if role == "employee":
             cleaned["is_staff"] = True
             if not branch:
                 raise forms.ValidationError("Zaposleni mora imati dodijeljenu filijalu/banku.")
 
-        # USER → NE SMIJE imati branch
         if role == "user" and branch is not None:
             raise forms.ValidationError("Obični korisnik ne može imati dodijeljenu filijalu/banku.")
 
-        # is_staff ne smije biti user
         if is_staff and role == "user":
             raise forms.ValidationError("Ako je is_staff=True, role mora biti employee ili admin.")
 
@@ -54,7 +49,6 @@ class UserAdminForm(forms.ModelForm):
         user = super().save(commit=False)
 
         raw = user.password or ""
-        # provjera: da li je već hash (pbkdf2_..., argon2..., bcrypt..., scrypt...)
         is_hashed = False
         try:
             identify_hasher(raw)

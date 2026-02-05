@@ -25,29 +25,23 @@ class User(AbstractUser):
     def clean(self):
         super().clean()
 
-        # 1) Superuser => admin + staff
         if self.is_superuser:
             self.role = "admin"
             self.is_staff = True
 
-        # 2) Employee => mora biti staff
         if self.role == "employee":
             self.is_staff = True
 
-            # 3) Employee => mora imati branch
             if not self.branch_id:
                 raise ValidationError({"branch": "Zaposleni mora imati dodijeljenu filijalu/banku."})
 
-        # 4) Staff => role mora biti employee ili admin
         if self.is_staff and self.role == "user":
             raise ValidationError({"role": "Ako je is_staff=True, role mora biti employee ili admin."})
 
-        # 5) Običan user (nije admin) => nije staff
         if self.role == "user" and not self.is_superuser:
             self.is_staff = False
 
     def save(self, *args, **kwargs):
-        # da validacija radi uvijek (admin, shell, API…)
         self.full_clean()
         super().save(*args, **kwargs)
 
@@ -59,11 +53,9 @@ class Branch(models.Model):
     address = models.CharField(max_length=255)
     city = models.CharField(max_length=100)
 
-    # Standardno 08:00–16:00
     open_time = models.TimeField(default=time(8, 0))
     close_time = models.TimeField(default=time(16, 0))
 
-    # Fiksni slotovi (npr. 30 minuta)
     slot_minutes = models.PositiveIntegerField(default=30)
 
     def __str__(self):
@@ -130,7 +122,7 @@ class ChatMessage(models.Model):
         related_name="chat_messages"
     )
     session_id = models.CharField(max_length=64, db_index=True)
-    role = models.CharField(max_length=10)  # "user" | "assistant"
+    role = models.CharField(max_length=10)  
     content = models.TextField()
 
     created_at = models.DateTimeField(auto_now_add=True)

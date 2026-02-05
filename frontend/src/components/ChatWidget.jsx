@@ -3,7 +3,7 @@ import { sendChat, fetchChatHistory } from "../api/chat";
 import { useAuth } from "../context/AuthContext";
 
 export default function ChatWidget() {
-  useAuth(); // dovoljno da se context “aktivira” ako ti u njemu radi fetchMe/guard; ne moraš ništa da koristiš
+  useAuth(); 
 
   const [messages, setMessages] = useState([]);
   const [text, setText] = useState("");
@@ -13,14 +13,12 @@ export default function ChatWidget() {
 
   const endRef = useRef(null);
 
-  const canSend = useMemo(() => text.trim().length > 0 && !sending, [text, sending]);
+  const canSend = useMemo(() => text.trim().length > 0 && !sending, [text, sending]);// useMemo se koristi za optimizaciju performansi, kako bi se izbeglo ponovno izračunavanje vrednosti canSend pri svakom renderovanju komponente, osim ako se ne promene zavisnosti (text ili sending).
 
-  // autoscroll
   useEffect(() => {
     endRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages.length]);
 
-  // load history on mount
   useEffect(() => {
     let cancelled = false;
 
@@ -29,7 +27,7 @@ export default function ChatWidget() {
       setError("");
 
       try {
-        const history = await fetchChatHistory(); // očekujem: [{role, content, created_at}]
+        const history = await fetchChatHistory(); 
         if (cancelled) return;
 
         if (Array.isArray(history) && history.length > 0) {
@@ -40,7 +38,6 @@ export default function ChatWidget() {
             }))
           );
         } else {
-          // ako nema istorije, ubaci greeting
           setMessages([{ role: "assistant", content: "Zdravo! Kako mogu da pomognem?" }]);
         }
       } catch (e) {
@@ -68,7 +65,6 @@ export default function ChatWidget() {
 
     const userMsg = { role: "user", content: trimmed };
 
-    // optimistic UI
     setMessages((m) => [...m, userMsg]);
     setText("");
     setSending(true);

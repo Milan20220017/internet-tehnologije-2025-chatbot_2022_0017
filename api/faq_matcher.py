@@ -1,14 +1,12 @@
 from typing import Optional, Dict
-from .models import Branch, FAQEntry
+from .models import Branch
 import requests
 
 def normalize(text: str) -> str:
     return text.lower()
 
-
 def match_faq(message: str) -> Optional[Dict]:
     msg = normalize(message)
-    # 🌤️ VREMENSKA PROGNOZA
     if any(k in msg for k in ["stepeni", "temperatura", "vreme", "vrijeme"]):
         try:
             r = requests.get(
@@ -39,7 +37,6 @@ def match_faq(message: str) -> Optional[Dict]:
             "reply": "Filijale rade radnim danima od 08:00 do 16:00.",
             "link": ""
         }
-
    
     if any(k in msg for k in ["filijale", "poslovnice", "gde se nalazite", "adresa"]):
         branches = Branch.objects.all().order_by("city", "name")
@@ -58,7 +55,6 @@ def match_faq(message: str) -> Optional[Dict]:
             "link": ""
         }
 
-   
     if any(k in msg for k in ["dokument", "papiri", "šta mi treba", "sta mi treba"]):
         return {
             "intent": "docs_required",
@@ -70,7 +66,6 @@ def match_faq(message: str) -> Optional[Dict]:
             "link": ""
         }
 
- 
     if any(k in msg for k in ["termin", "zakaz", "rezerv"]):
         return {
             "intent": "appointments_help",

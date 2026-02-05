@@ -22,8 +22,8 @@ export default function Login() {
       localStorage.setItem("accessToken", data.access);
       localStorage.setItem("refreshToken", data.refresh);
 
-      await refreshUser();
-      nav("/reserve");
+      await refreshUser();// osvežavanje podataka o korisniku nakon uspešne prijave
+      nav("/reserve");// preusmeravanje na stranicu rezervacije nakon uspešne prijave
     } catch (e2) {
       setErr("Neuspešna prijava. Proveri username i lozinku.");
     } finally {

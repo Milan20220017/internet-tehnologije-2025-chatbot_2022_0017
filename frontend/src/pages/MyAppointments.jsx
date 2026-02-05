@@ -4,7 +4,7 @@ import { fetchMyAppointments, cancelAppointment } from "../api/appointments";
 function formatDT(dt) {
   if (!dt) return "";
   const d = new Date(dt);
-  if (Number.isNaN(d.getTime())) return dt; // ako nije ISO, prikaži raw
+  if (Number.isNaN(d.getTime())) return dt; 
   return d.toLocaleString("sr-RS", {
     year: "numeric",
     month: "2-digit",

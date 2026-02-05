@@ -32,7 +32,6 @@ export default function Register() {
       nav("/login");
     } catch (e) {
       const data = e?.response?.data;
-      // DRF često vraća objekte tipa {field: ["msg"]}
       if (data && typeof data === "object") {
         const firstKey = Object.keys(data)[0];
         const msg = Array.isArray(data[firstKey]) ? data[firstKey][0] : String(data[firstKey]);

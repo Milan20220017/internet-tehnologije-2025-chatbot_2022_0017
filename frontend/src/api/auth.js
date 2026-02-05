@@ -1,6 +1,4 @@
-// src/api/auth.js
-import api from "./api"; // tvoj axios instance
-// src/api/auth.js
+import api from "./api";
 import axios from "axios";
 
 export async function me() {
@@ -34,7 +32,6 @@ export async function loginUser({ username, password }) {
   return res.data;
 }
 export function logoutUser() {
-  // JWT logout = obriši tokene lokalno
   localStorage.removeItem("access");
   localStorage.removeItem("refresh");
 }

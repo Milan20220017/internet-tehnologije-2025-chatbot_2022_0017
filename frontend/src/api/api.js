@@ -2,13 +2,13 @@ import axios from "axios";
 
 const BASE = "http://127.0.0.1:8000/api";
 
-const api = axios.create({
+const api = axios.create({// kreiranje axios instance s baznim URL-om i zaglavljima
   baseURL: BASE,
   headers: { "Content-Type": "application/json" },
 });
 
-api.interceptors.request.use((config) => {
-  const token = localStorage.getItem("access");
+api.interceptors.request.use((config) => {// interceptor za dodavanje access tokena u zaglavlje svakog zahtjeva
+  const token = localStorage.getItem("access");// LocalStorage je ugrađeni web storage objekt koji omogućava web aplikacijama da skladište podatke lokalno unutar preglednika korisnika.
   if (token) config.headers.Authorization = `Bearer ${token}`;
   return config;
 });
@@ -27,27 +27,24 @@ api.interceptors.response.use(
     const original = error.config;
     const status = error.response?.status;
 
-    // samo 401 i samo jednom po requestu
-    if (status !== 401 || original?._retry) {
+    if (status !== 401 || original?._retry) {// retry sprecava beskonačnu petlju
       return Promise.reject(error);
     }
 
-    // ne pokušavaj refresh ako je baš login/refresh endpoint pukao
-    if (original?.url?.includes("/auth/login/") || original?.url?.includes("/auth/refresh/")) {
+    if (original?.url?.includes("/auth/login/") || original?.url?.includes("/auth/refresh/")) {// ne pokušavaj osvježiti token ako je greška došla s login ili refresh endpointa
       return Promise.reject(error);
     }
 
-    const refresh = localStorage.getItem("refresh");
-    if (!refresh) return Promise.reject(error);
+    const refresh = localStorage.getItem("refresh");// dohvaćanje refresh tokena iz localStorage
+    if (!refresh) return Promise.reject(error);// ako nema refresh tokena, odbaci grešku
 
-    original._retry = true;
+    original._retry = true;//da ne bi ušli u beskonačnu petlju
 
-    // ako refresh već traje, sačekaj
     if (isRefreshing) {
       return new Promise((resolve) => {
         queue.push((newAccess) => {
-          original.headers.Authorization = `Bearer ${newAccess}`;
-          resolve(api(original));
+          original.headers.Authorization = `Bearer ${newAccess}`;// postavljanje novog access tokena u zaglavlje originalnog zahtjeva
+          resolve(api(original));// ponovni pokušaj originalnog zahtjeva s novim tokenom
         });
       });
     }
@@ -70,7 +67,6 @@ api.interceptors.response.use(
       original.headers.Authorization = `Bearer ${newAccess}`;
       return api(original);
     } catch (e) {
-      // refresh neuspešan => izbaci korisnika
       localStorage.removeItem("access");
       localStorage.removeItem("refresh");
       return Promise.reject(e);

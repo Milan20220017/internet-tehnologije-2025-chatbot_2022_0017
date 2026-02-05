@@ -1,4 +1,3 @@
-import React from "react";
 import { Navigate, Route, Routes } from "react-router-dom";
 import Login from "./pages/Login.jsx";
 import Register from "./pages/Register.jsx";
@@ -10,10 +9,6 @@ import FloatingChat from "./components/FloatingChat";
 import { useAuth } from "./context/AuthContext.jsx";
 import EmployeeAppointments from "./pages/EmployeeAppointments.jsx";
 
-
-/**
- * Osnovna zaštita: mora biti ulogovan
- */
 function Protected({ children }) {
   const { isLoading, isAuthed } = useAuth();
 
@@ -32,10 +27,6 @@ function Protected({ children }) {
   return children;
 }
 
-/**
- * Role-based zaštita: dozvoli samo određenim rolama
- * allow = ["user"] | ["employee"] | ["admin"] | kombinacije
- */
 function RoleProtected({ allow = [], children }) {
   const { isLoading, isAuthed, user } = useAuth();
 
@@ -65,14 +56,11 @@ export default function App() {
 
       <div className="container py-4">
         <Routes>
-          {/* default */}
           <Route path="/" element={<Navigate to="/reserve" replace />} />
 
-          {/* auth */}
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
 
-          {/* USER rute */}
           <Route
             path="/reserve"
             element={
@@ -108,20 +96,6 @@ export default function App() {
             }
           />
 
-          {/* EMPLOYEE ruta (za sada placeholder) */}
-          {/* <Route
-            path="/employee"
-            element={
-              <RoleProtected allow={["employee"]}>
-                <div className="card p-3">
-                  <h4>Employee panel</h4>
-                  <p>Ovde će ići termini tvoje filijale.</p>
-                </div>
-              </RoleProtected>
-            }
-          /> */}
-
-          {/* ADMIN ruta (placeholder) */}
           <Route
             path="/admin"
             element={
@@ -134,7 +108,6 @@ export default function App() {
             }
           />
 
-          {/* fallback */}
           <Route path="*" element={<div className="card">404</div>} />
         </Routes>
       </div>

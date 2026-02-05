@@ -13,12 +13,12 @@ from datetime import datetime, time
 from django.utils import timezone
 from .serializers import ChatRequestSerializer
 from .groq_client import groq_chat_json
-User = get_user_model()
 from .permissions import IsEmployeeRole
 import os
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
+User = get_user_model()
 
 class WeatherView(APIView):
     def get(self, request):
@@ -44,7 +44,6 @@ class WeatherView(APIView):
             r.raise_for_status()
             data = r.json()
 
-            # Vraćamo samo ono što nam treba (čisto i pregledno)
             return Response({
                 "city": data["name"],
                 "temperature": data["main"]["temp"],
@@ -165,7 +164,7 @@ class BranchSlotsView(APIView):
     permission_classes = [permissions.AllowAny]
 
     def get(self, request, branch_id: int):
-        date_str = request.query_params.get("date")  # YYYY-MM-DD
+        date_str = request.query_params.get("date")  
         if not date_str:
             return Response({"detail": "Query param 'date' je obavezan (YYYY-MM-DD)."}, status=400)
 
@@ -176,7 +175,6 @@ class BranchSlotsView(APIView):
         except ValueError:
             return Response({"detail": "Pogrešan format datuma. Koristi YYYY-MM-DD."}, status=400)
 
-        # napravi sve slotove za taj dan u okviru radnog vremena
         tz = timezone.get_current_timezone()
 
         start_dt = timezone.make_aware(datetime.combine(day, branch.open_time), tz)
@@ -184,7 +182,6 @@ class BranchSlotsView(APIView):
 
         slot_delta = timezone.timedelta(minutes=branch.slot_minutes)
 
-        # zauzeti slotovi (samo booked)
         booked = set(
             Appointment.objects.filter(
                 branch=branch,

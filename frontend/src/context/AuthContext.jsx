@@ -7,11 +7,11 @@ export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  const hasToken = !!localStorage.getItem("access"); 
+  const hasToken = !!localStorage.getItem("access"); // pretvaranje u boolean
 
   async function refreshUser() {
     try {
-      const me = await fetchMe();
+      const me = await fetchMe();// dohvaćanje podataka o korisniku
       setUser(me);
     } catch (e) {
       setUser(null);
@@ -44,7 +44,7 @@ export function AuthProvider({ children }) {
     [user, isLoading, hasToken]
   );
 
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;// pružanje konteksta djeci
 }
 
 export function useAuth() {

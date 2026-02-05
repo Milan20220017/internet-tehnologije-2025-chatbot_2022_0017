@@ -134,7 +134,7 @@ REST_FRAMEWORK = {
         "rest_framework_simplejwt.authentication.JWTAuthentication",
     ],
     "DEFAULT_PERMISSION_CLASSES": [
-        "rest_framework.permissions.AllowAny",  # globalno, kasnije ćemo po view-ovima stezati
+        "rest_framework.permissions.AllowAny",  
     ],
 }
 SPECTACULAR_SETTINGS = {
