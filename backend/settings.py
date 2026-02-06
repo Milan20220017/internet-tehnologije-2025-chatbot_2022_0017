@@ -138,6 +138,14 @@ _env_cors = os.getenv("CORS_ALLOWED_ORIGINS", "")
 if _env_cors.strip():
     CORS_ALLOWED_ORIGINS = [x.strip() for x in _env_cors.split(",") if x.strip()]
 CSRF_TRUSTED_ORIGINS = [x.strip() for x in os.getenv("CSRF_TRUSTED_ORIGINS", "").split(",") if x.strip()]
+CSRF_TRUSTED_ORIGINS = [
+    "https://internet-tehnologije-2025-chatbot20220017-production.up.railway.app",
+]
+
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
+CSRF_COOKIE_SAMESITE = "Lax"
+SESSION_COOKIE_SAMESITE = "Lax"
 
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
