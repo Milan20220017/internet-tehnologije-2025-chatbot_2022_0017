@@ -19,6 +19,54 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 User = get_user_model()
+from django.db.models import Count
+from rest_framework.permissions import IsAuthenticated
+from .permissions import IsAdminRole
+class AppointmentsByStatusStatsView(APIView):
+    permission_classes = [IsAuthenticated, IsAdminRole]
+
+    def get(self, request):
+        rows = (
+            Appointment.objects.values("status")
+            .annotate(total=Count("id"))
+            .order_by("status")
+        )
+        return Response(rows)
+User = get_user_model()
+class TopUsersByAppointmentsStatsView(APIView):
+    permission_classes = [IsAuthenticated, IsAdminRole]
+
+    def get(self, request):
+        limit = int(request.query_params.get("limit", 5))
+        rows = (
+            Appointment.objects.filter(status="booked")
+            .values("user__username")
+            .annotate(total=Count("id"))
+            .order_by("-total")[:limit]
+        )
+        return Response(rows)
+class UsersByRoleStatsView(APIView):
+    permission_classes = [IsAuthenticated, IsAdminRole]
+
+    def get(self, request):
+        rows = (
+            User.objects.values("role")
+            .annotate(total=Count("id"))
+            .order_by("role")
+        )
+        return Response(rows)
+class AppointmentsByBranchStatsView(APIView):
+    permission_classes = [IsAuthenticated, IsAdminRole]
+
+    def get(self, request):
+        data = (
+            Appointment.objects
+            .values("branch__name")
+            .annotate(total=Count("id"))
+            .order_by("branch__name")
+        )
+
+        return Response(data)
 
 class WeatherView(APIView):
     def get(self, request):

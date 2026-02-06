@@ -147,3 +147,49 @@ Primene zaštite:
 Frontend koristi axios interceptore za automatsko dodavanje  
 `Authorization: Bearer <access>` zaglavlja i automatsko osvežavanje tokena putem  
 `/api/auth/refresh/` endpointa u slučaju `401 Unauthorized` greške.
+
+---
+
+## Automatizovani testovi
+
+Aplikacija sadrži automatizovane testove implementirane korišćenjem Django test framework-a.
+
+Testovi obuhvataju:
+- registraciju i prijavu korisnika (JWT autentifikacija),
+- kreiranje termina od strane korisnika,
+- zabranu rezervacije termina za zaposlene,
+- zabranu duplog zakazivanja istog termina,
+- IDOR zaštitu (samo vlasnik termina može izvršiti otkazivanje).
+```bash
+python manage.py test
+```
+
+## CI/CD (GitHub Actions)
+
+Projekat koristi GitHub Actions za kontinuiranu integraciju (CI/CD).
+
+Pipeline se automatski pokreće na svaki push i pull request ka `develop` i `main` granama i obavlja sledeće korake:
+- instalaciju backend zavisnosti,
+- pokretanje Django migracija,
+- izvršavanje automatizovanih testova,
+- build frontend aplikacije,
+- build Docker image-a aplikacije.
+
+Na ovaj način se obezbeđuje da se promene integrišu samo ukoliko svi testovi uspešno prođu.
+
+## Eksterni API-ji
+
+Aplikacija koristi više eksternih API-ja:
+
+- **Groq API (LLM)** – koristi se za generisanje odgovora chatbot-a, obradu korisničkih upita i fallback odgovore kada ne postoji odgovarajući FAQ.
+- **OpenWeather API** – koristi se za pribavljanje i prikaz trenutnih vremenskih podataka za izabrani grad.
+Eksterni API-ji se koriste putem HTTP zahteva ka spoljnim servisima, čime je ispunjen zahtev za korišćenje najmanje dva eksterna API-ja.
+
+## Dodatne bezbednosne mere
+
+Pored osnovnih mehanizama autentifikacije i autorizacije, aplikacija sadrži i sledeće bezbednosne mere:
+
+- **Zaštita od SQL Injection napada** – implementirana korišćenjem Django ORM-a, bez upotrebe raw SQL upita.
+- **Zaštita od XSS napada** – frontend aplikacija je implementirana u React-u koji automatski escapuje korisnički unos (ne koristi se `dangerouslySetInnerHTML`).
+- **CSRF rizik je umanjen** – aplikacija koristi JWT autentifikaciju kroz `Authorization` HTTP zaglavlje, čime se sprečava automatsko slanje tokena putem kolačića.
+- **IDOR zaštita** – korisnici mogu manipulisati (otkazivati) samo sopstvenim terminima, uz eksplicitnu proveru vlasništva na backend-u.
