@@ -148,7 +148,5 @@ SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
 CSRF_COOKIE_SAMESITE = "Lax"
 SESSION_COOKIE_SAMESITE = "Lax"
-default_app_config = "api.apps.ApiConfig"
-
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
