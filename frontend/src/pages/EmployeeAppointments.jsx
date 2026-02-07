@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "../context/AuthContext.jsx";
+import api from "../api/api"; // prilagodi putanju ako ti je drugačija
 
 export default function EmployeeAppointments() {
   const { user } = useAuth();
@@ -10,23 +11,14 @@ export default function EmployeeAppointments() {
   useEffect(() => {
     const fetchAppointments = async () => {
       try {
-        const res = await fetch(
-          "http://127.0.0.1:8000/api/employee/appointments/",
-          {
-            headers: {
-              Authorization: "Bearer " + localStorage.getItem("access"),
-            },
-          }
-        );
-
-        if (!res.ok) {
-          throw new Error("Ne mogu da učitam termine.");
-        }
-
-        const data = await res.json();
-        setAppointments(data);
+        const res = await api.get("/employee/appointments/"); // baseURL već sadrži /api
+        setAppointments(res.data);
       } catch (err) {
-        setError(err.message || "Greška pri učitavanju.");
+        setError(
+          err?.response?.data?.detail ||
+          err?.message ||
+          "Greška pri učitavanju."
+        );
       } finally {
         setLoading(false);
       }
